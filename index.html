@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scinnohub — AI Drug Discovery Studio</title>
+  <!-- Step 2: Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* =============================================
+       Reset + Design Tokens — Light Futuristic Theme
+       ============================================= */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      /* Ice-cold futuristic palette */
+      --color-bg:       #ddeeff;   /* icy blue-white */
+      --color-surface:  #ffffff;   /* card / nav base (glassmorphism overrides below) */
+      --color-surface2: #cce4f7;   /* about section band */
+      --color-accent:   #2563eb;   /* electric blue — primary */
+      --color-teal:     #0891b2;   /* cyan — tags / labels */
+      --color-text:     #0f172a;   /* near-black — high contrast */
+      --color-muted:    #475569;   /* slate — body / subtitles */
+      --color-border:   rgba(37, 99, 235, 0.14);
+
+      --font-heading: 'Syne', sans-serif;
+      --font-body:    'Inter', sans-serif;
+
+      --max-width: 1100px;
+      --section-pad: 100px;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      background-color: var(--color-bg);
+      /* Ice-cold multi-layer: diagonal frost gradient + dot-grid */
+      background-image:
+        radial-gradient(circle, rgba(37, 99, 235, 0.07) 1px, transparent 1px),
+        linear-gradient(135deg, #ddeeff 0%, #c8e8ff 40%, #d6f0ff 70%, #e8f6ff 100%);
+      background-size: 28px 28px, cover;
+      color: var(--color-text);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* =============================================
+       Header & Navigation
+       ============================================= */
+    #site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(221, 238, 255, 0.72);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.55);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .nav-logo {
+      font-family: var(--font-heading);
+      font-size: 1.35rem;
+      font-weight: 800;
+      /* No negative letter-spacing — prevents glyph clipping */
+      letter-spacing: 0;
+      color: var(--color-text);
+    }
+
+    .nav-logo span {
+      color: var(--color-accent);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--color-muted);
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--color-accent);
+    }
+
+    /* =============================================
+       Hero Section
+       ============================================= */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      /* Extra top padding clears the 64px fixed nav */
+      padding: 128px 2rem 96px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Soft blue radial wash behind hero text */
+    #hero::before {
+      content: '';
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 800px;
+      height: 600px;
+      background: radial-gradient(ellipse, rgba(37, 99, 235, 0.08) 0%, transparent 68%);
+      pointer-events: none;
+    }
+
+    /* Secondary cyan wash */
+    #hero::after {
+      content: '';
+      position: absolute;
+      top: 65%;
+      left: 58%;
+      transform: translate(-50%, -50%);
+      width: 500px;
+      height: 350px;
+      background: radial-gradient(ellipse, rgba(8, 145, 178, 0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(37, 99, 235, 0.08);
+      border: 1px solid rgba(37, 99, 235, 0.25);
+      border-radius: 999px;
+      padding: 0.4rem 1.1rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--color-accent);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 1.75rem;
+    }
+
+    .hero-title {
+      font-family: var(--font-heading);
+      font-size: clamp(2.2rem, 5.5vw, 4rem);
+      font-weight: 800;
+      /* Increased from 1.1 — prevents descender/ascender clipping */
+      line-height: 1.18;
+      /* Reduced from -0.03em — avoids glyph overlap */
+      letter-spacing: -0.01em;
+      color: var(--color-text);
+      /* Generous vertical padding so no glyph is clipped by overflow */
+      padding: 0.1em 0;
+      margin-bottom: 1.35rem;
+    }
+
+    .hero-title .accent {
+      color: var(--color-accent);
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1rem, 2vw, 1.15rem);
+      color: var(--color-muted);
+      max-width: 540px;
+      margin: 0 auto 2.75rem;
+      /* Comfortable reading line-height */
+      line-height: 1.75;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      background: var(--color-accent);
+      color: #fff;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 0.9rem 2.4rem;
+      border-radius: 8px;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: #1d4ed8;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(37, 99, 235, 0.3);
+    }
+
+    /* =============================================
+       Projects Section
+       ============================================= */
+    #projects {
+      padding: var(--section-pad) 0;
+    }
+
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--color-teal);
+      margin-bottom: 0.6rem;
+    }
+
+    .section-title {
+      font-family: var(--font-heading);
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 700;
+      /* Relaxed letter-spacing — prevents clipping in Syne at large sizes */
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+      color: var(--color-text);
+      margin-bottom: 0.85rem;
+    }
+
+    .section-subtitle {
+      font-size: 1rem;
+      color: var(--color-muted);
+      max-width: 520px;
+      margin-bottom: 3.5rem;
+      line-height: 1.75;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.75rem;
+    }
+
+    /* =============================================
+       Card styles + hover effects
+       ============================================= */
+    .card {
+      /* Glassmorphism: frosted-glass panel over the icy background */
+      background: rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(18px) saturate(160%);
+      -webkit-backdrop-filter: blur(18px) saturate(160%);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: 14px;
+      padding: 2rem 1.75rem 1.75rem;
+      position: relative;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+      box-shadow:
+        0 4px 16px rgba(37, 99, 235, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    /* Blue→cyan shimmer line on hover */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      border-radius: 14px 14px 0 0;
+      background: linear-gradient(90deg, var(--color-accent), var(--color-teal));
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      background: rgba(255, 255, 255, 0.65);
+      border-color: rgba(255, 255, 255, 0.9);
+      box-shadow:
+        0 20px 48px rgba(37, 99, 235, 0.14),
+        0 4px 16px rgba(37, 99, 235, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card-icon {
+      font-size: 2rem;
+      margin-bottom: 1.25rem;
+      display: block;
+      /* Prevent emoji from being clipped */
+      line-height: 1.3;
+    }
+
+    .card-title {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 1.3;
+      color: var(--color-text);
+      margin-bottom: 0.65rem;
+    }
+
+    .card-desc {
+      font-size: 0.9rem;
+      color: var(--color-muted);
+      line-height: 1.7;
+    }
+
+    .card-ai-badge {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: #1e3a8a;
+      color: #ffffff;
+      font-family: var(--font-heading);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      padding: 0.28rem 0.6rem;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(30, 58, 138, 0.35);
+      user-select: none;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 1.35rem;
+      gap: 0.75rem;
+    }
+
+    .card-tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-teal);
+      background: rgba(8, 145, 178, 0.09);
+      border: 1px solid rgba(8, 145, 178, 0.22);
+      padding: 0.28rem 0.75rem;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .card-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--color-accent);
+      white-space: nowrap;
+      transition: gap 0.2s, opacity 0.2s;
+    }
+
+    .card-link::after {
+      content: '→';
+      display: inline-block;
+      transition: transform 0.2s;
+    }
+
+    .card-link:hover {
+      opacity: 0.8;
+    }
+
+    .card-link:hover::after {
+      transform: translateX(3px);
+    }
+
+    .card-link[aria-disabled="true"] {
+      color: var(--color-muted);
+      pointer-events: none;
+      opacity: 0.55;
+    }
+
+    /* =============================================
+       About Section
+       ============================================= */
+    #about {
+      padding: var(--section-pad) 0;
+      background: rgba(200, 232, 255, 0.55);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      background-image: none;
+      border-top: 1px solid var(--color-border);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .about-text p {
+      font-size: 1rem;
+      color: var(--color-muted);
+      line-height: 1.8;
+      margin-top: 1.25rem;
+    }
+
+    .about-text p + p {
+      margin-top: 1rem;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(14px) saturate(150%);
+      -webkit-backdrop-filter: blur(14px) saturate(150%);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: 12px;
+      padding: 1.6rem 1.25rem;
+      text-align: center;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .stat-value {
+      font-family: var(--font-heading);
+      font-size: 2rem;
+      font-weight: 800;
+      /* Extra line-height so tall glyphs (3×) are never clipped */
+      line-height: 1.15;
+      color: var(--color-accent);
+      margin-bottom: 0.45rem;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--color-muted);
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    /* =============================================
+       Contact Section
+       ============================================= */
+    #contact {
+      padding: var(--section-pad) 0;
+      text-align: center;
+    }
+
+    .contact-inner {
+      max-width: 540px;
+      margin: 0 auto;
+    }
+
+    .contact-inner .section-subtitle {
+      margin: 0.85rem auto 2.75rem;
+      max-width: 420px;
+    }
+
+    .btn-outline {
+      display: inline-block;
+      border: 2px solid var(--color-accent);
+      color: var(--color-accent);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 0.9rem 2.4rem;
+      border-radius: 8px;
+      transition: background 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-outline:hover {
+      background: var(--color-accent);
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(37, 99, 235, 0.28);
+    }
+
+    /* =============================================
+       Footer
+       ============================================= */
+    footer {
+      background: var(--color-surface);
+      border-top: 1px solid var(--color-border);
+      padding: 1.75rem 2rem;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--color-muted);
+    }
+
+    footer a {
+      color: var(--color-accent);
+      transition: color 0.2s;
+    }
+
+    footer a:hover {
+      color: var(--color-teal);
+    }
+
+    /* =============================================
+       Responsive
+       ============================================= */
+    @media (max-width: 768px) {
+      :root {
+        --section-pad: 64px;
+      }
+
+      .nav-links {
+        gap: 1.5rem;
+      }
+
+      .nav-links a {
+        font-size: 0.82rem;
+      }
+
+      .about-grid {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+      }
+
+      .cards-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .nav-links {
+        gap: 1rem;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =============================================
+       STEP 3 — Sticky Navigation Header
+       ============================================= -->
+  <header id="site-header" role="banner">
+    <nav class="container nav-inner" aria-label="Main navigation">
+      <a href="#hero" class="nav-logo">Scinno<span>hub</span></a>
+      <ul class="nav-links">
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- =============================================
+       STEP 3 — Hero Section
+       ============================================= -->
+  <section id="hero" aria-label="Hero">
+    <div class="hero-content">
+      <span class="hero-badge">AI · Drug Discovery · Molecular Design</span>
+      <h1 class="hero-title">
+        Scinnohub <span class="accent">AI</span><br />Drug Discovery Studio
+      </h1>
+      <p class="hero-subtitle">
+        Accelerating molecular innovation with artificial intelligence —
+        from generative design to binding prediction.
+      </p>
+      <a href="#projects" class="btn-primary">Explore Projects</a>
+    </div>
+  </section>
+
+  <!-- =============================================
+       STEP 4 — Projects Section
+       ============================================= -->
+  <section id="projects" aria-labelledby="projects-heading">
+    <div class="container">
+      <p class="section-label">Our Modules</p>
+      <h2 class="section-title" id="projects-heading">AI-Powered Projects</h2>
+      <p class="section-subtitle">
+        Four integrated modules cover the full drug discovery pipeline,
+        from de novo design to lead optimization.
+      </p>
+
+      <div class="cards-grid">
+
+        <article class="card">
+          <span class="card-icon" aria-hidden="true">⚗️</span>
+          <h3 class="card-title">AI Drug Design</h3>
+          <p class="card-desc">
+            End-to-end generative molecule design pipelines. Produce novel
+            drug candidates with target-specific constraints using deep
+            generative models.
+          </p>
+          <div class="card-footer">
+            <span class="card-tag">Generative AI</span>
+            <a href="/drug-design" class="card-link">Try now</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="card-icon" aria-hidden="true">🔬</span>
+          <h3 class="card-title">Molecular Docking</h3>
+          <p class="card-desc">
+            Binding affinity prediction and pose optimization. Evaluate
+            how candidate molecules interact with protein binding sites
+            at atomic resolution.
+          </p>
+          <div class="card-footer">
+            <span class="card-tag">Structural Biology</span>
+            <a href="/molecular-docking" class="card-link">Try now</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="card-icon" aria-hidden="true">📊</span>
+          <h3 class="card-title">Property Prediction</h3>
+          <p class="card-desc">
+            ADMET and physicochemical property forecasting. Screen for
+            absorption, distribution, metabolism, excretion, and toxicity
+            before synthesis.
+          </p>
+          <div class="card-footer">
+            <span class="card-tag">ADMET</span>
+            <a href="/property-prediction" class="card-link">Try now</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="card-icon" aria-hidden="true">⚙️</span>
+          <h3 class="card-title">Structure Optimization</h3>
+          <p class="card-desc">
+            Lead optimization via multi-objective ML models. Iteratively
+            refine molecular structures to improve potency, selectivity,
+            and drug-likeness simultaneously.
+          </p>
+          <div class="card-footer">
+            <span class="card-tag">Lead Optimization</span>
+            <a href="/structure-optimization" class="card-link">Try now</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="card-icon" aria-hidden="true">🧪</span>
+          <h3 class="card-title">Molecular Synthetic Route Prediction</h3>
+          <p class="card-desc">
+            AI synthetic route prediction (In development, stay tuned)
+          </p>
+          <div class="card-footer">
+            <span class="card-tag">Coming Soon</span>
+            <a href="/synthetic-route" class="card-link" aria-disabled="true">Try now</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <span class="card-ai-badge" aria-hidden="true">AI+</span>
+          <span class="card-icon" aria-hidden="true">🤖</span>
+          <h3 class="card-title">Agentic AI for Drug Discovery</h3>
+          <p class="card-desc">
+            Reasoning &amp; Planning. Executes workflows, calls tools. Principal Investigator. Dynamic: Learns from real-time lab data.
+          </p>
+          <div class="card-footer">
+            <span class="card-tag">Agentic AI</span>
+            <a href="/AgenticAI/" class="card-link" target="_blank" rel="noopener noreferrer" data-agentic-link>Try now</a>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================
+       STEP 6 — About Section
+       ============================================= -->
+  <section id="about" aria-labelledby="about-heading">
+    <div class="container">
+      <div class="about-grid">
+
+        <div class="about-text">
+          <p class="section-label">About Us</p>
+          <h2 class="section-title" id="about-heading">Bridging AI &amp; Drug Discovery</h2>
+          <p>
+            Scinnohub is an AI-driven drug discovery platform that combines
+            cutting-edge machine learning with deep expertise in computational
+            chemistry and structural biology.
+          </p>
+          <p>
+            Our mission is to compress the drug discovery timeline — from
+            target identification to optimized lead — by replacing slow,
+            costly experimental cycles with rapid, accurate in-silico
+            prediction.
+          </p>
+          <p>
+            Built by interdisciplinary teams spanning medicinal chemistry,
+            bioinformatics, and AI research, our studio provides the tools
+            researchers need to accelerate every stage of the pipeline.
+          </p>
+        </div>
+
+        <div class="stats-grid" aria-label="Key statistics">
+          <div class="stat-card">
+            <div class="stat-value">10k+</div>
+            <div class="stat-label">Molecules Analyzed</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">4</div>
+            <div class="stat-label">AI Modules</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">98%</div>
+            <div class="stat-label">Prediction Accuracy</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">3×</div>
+            <div class="stat-label">Faster Discovery</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================
+       STEP 7 — Contact Section
+       ============================================= -->
+  <section id="contact" aria-labelledby="contact-heading">
+    <div class="container">
+      <div class="contact-inner">
+        <p class="section-label">Get In Touch</p>
+        <h2 class="section-title" id="contact-heading">Ready to Collaborate?</h2>
+        <p class="section-subtitle">
+          Visit our main site to learn more about our services, partnerships,
+          and how Scinnohub can accelerate your research.
+        </p>
+        <a
+          href="http://www.scinnohub.com/"
+          class="btn-outline"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Visit Scinnohub.com ↗
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================
+       STEP 8 — Footer
+       ============================================= -->
+  <footer role="contentinfo">
+    <p>
+      &copy; 2026 <a href="http://www.scinnohub.com/" target="_blank" rel="noopener noreferrer">Scinnohub</a>.
+      All rights reserved.
+    </p>
+  </footer>
+
+<script>
+  // Rewrite the Agentic AI "Try now" link at runtime.
+  // The terminal server always runs on port 3001.  Using window.location.hostname
+  // (not localhost) means LAN visitors get the correct machine IP automatically,
+  // regardless of which server or port is currently serving this main page.
+  (function () {
+    var link = document.querySelector('[data-agentic-link]');
+    if (link) {
+      link.href = 'http://' + window.location.hostname + ':3001/AgenticAI/';
+    }
+  })();
+</script>
+</body>
+</html>
